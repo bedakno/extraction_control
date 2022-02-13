@@ -1,3 +1,6 @@
+#ifndef ArdSer_h
+#define ArdSer_h
+
 #include <Arduino.h>
 
 class interface{
@@ -10,7 +13,8 @@ public:
     String arg3;
 
 private:
-    void resetInputBuffer(void)
+    void resetInputBuffer(void);
 };
 
 
+#endif

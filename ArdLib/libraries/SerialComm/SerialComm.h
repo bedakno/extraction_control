@@ -13,27 +13,32 @@
 #include "Fast_IO_Due.h"
 #include "ArdSer.h"
 
-class SerialComm:ArdSer,FastPID,Fast_IO_Due{
+
+class SerialComm: public interface, public FastPID, public Fast_IO_Due{
 public:
-    SerialComm(){};
+    SerialComm();
     ~SerialComm();
-    bool process();
+    bool process(FastPID);
     void resetInputBuffer();
     
 private:
-    static const char READ = "R";
-    static const char WRITE = "W";
-    static const char RESET = "X";
-    static const char CHECK = "C";
-    static const char ERR = "E";
-    static const char DELIM = ":";
-    static const char NL = "\n";
-    static const char TER = "\r";
+    String READ = "R";
+    String WRITE = "W";
+    String RESET = "X";
+    String CHECK = "C";
+    String ERR = "E";
+    String P = "P";
+    String I = "I";
+    String D = "D";
+    String F = "F";
+    String N = "N";
+    String DELIM = ":";
+    String NL = "\n";
+    String TER = "\r";
     
 private:
-    void write(char, uint32_t);
-    uint32_t read(char);
-    uint32_t readValue(char[], uint8_t);
+    void write(FastPID, String, uint32_t);
+    uint32_t read(FastPID, String);
     char* createCommand(char, char, uint32_t, size_t);
 };
 

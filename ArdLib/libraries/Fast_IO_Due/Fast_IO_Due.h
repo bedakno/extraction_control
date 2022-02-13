@@ -9,6 +9,7 @@
 #define Fast_IO_Due_h
 
 #include "Arduino.h"
+#include <initializer_list>
 
 extern int16_t IOnorm;
 

@@ -1,9 +1,9 @@
 #include "ArdSer.h"
 
-void readData(){
+void interface::receive(){
     uint8_t pos1, pos2, pos3;
 
-    message = Serial.readStringUntil('\n');
+    String message = Serial.readStringUntil('\n');
     pos1 = message.indexOf(':',0);
     pos2 = message.indexOf(':', pos1+1);
     pos3 = message.indexOf(':', pos2+1);
@@ -15,11 +15,11 @@ void readData(){
     resetInputBuffer();
 }
 
-void writeData(String data){
+void interface::transmit(String data){
     Serial.println(data);
 }
 
-void resetInputBuffer(void){
+void interface::resetInputBuffer(void){
     while(Serial.available()){
         Serial.read();
     }
