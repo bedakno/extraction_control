@@ -7,8 +7,6 @@
 
 #include "Fast_IO_Due.h"
 
-int16_t IOnorm;
-
 Fast_IO_Due::Fast_IO_Due(){
     size_t ci;
     for(ci=0; ci<12;ci++){
@@ -61,12 +59,6 @@ void Fast_IO_Due::initialize_dac(){
     //_get_dac_info(); //get some info, currently empty function
 }
 
-
-std::tuple<bool, char> Fast_IO_Due::_get_dac_info(){
-}
-
-std::tuple<bool, char> Fast_IO_Due::_get_adc_info(){
-}
 
 uint16_t Fast_IO_Due::read_adc(){
     while(!ADC_ISR_EOC7); //wait for channel to be ready

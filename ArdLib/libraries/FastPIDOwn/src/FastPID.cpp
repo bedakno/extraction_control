@@ -1,11 +1,6 @@
 #include "FastPID.h"
 #include <Arduino.h>
 
-uint32_t _p=0;
-uint32_t _i=0;
-uint32_t _d=0;
-uint32_t _hz=0;
-
 FastPID::~FastPID() {
 }
 

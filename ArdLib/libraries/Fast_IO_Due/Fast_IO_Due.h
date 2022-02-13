@@ -8,8 +8,6 @@
 #ifndef Fast_IO_Due_h
 #define Fast_IO_Due_h
 
-#include <initializer_list>
-#include <tuple>
 #include "Arduino.h"
 
 extern int16_t IOnorm;
@@ -26,11 +24,10 @@ public:
     void initialize_adc(std::initializer_list<uint8_t>);
     void initialize_dac();
     
+    int16_t IOnorm;
 private:
     void _setup_dac();
     void _setup_adc(uint32_t);
-    std::tuple<bool, char> _get_dac_info();
-    std::tuple<bool, char> _get_adc_info();
     uint32_t _enable_adc_channels(std::initializer_list<uint8_t>);
     uint8_t _adc_channels[12]={7,6,5,4,3,2,1,0,10,11,12,13}; //array containing the corresponding channels to adcs (A0 -> _adc_channels[0] ...)
     uint16_t _adc_channels_pow[12]; //array containing the powers (2^_adc_channels)

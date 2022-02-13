@@ -45,6 +45,10 @@ public:
         return _cfg_err;
     }
     
+    uint32_t _p;
+    uint32_t _i;
+    uint32_t _d;
+    uint32_t _hz;
 private:
     uint32_t floatToParam(float);
     float paramToFloat(uint32_t);
