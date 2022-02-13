@@ -25,7 +25,10 @@ private:
     static const char RESET = 'X';
     static const char CHECK = 'C';
     static const char ERR = 'E';
+<<<<<<< HEAD
     static const char DELIM = ':'
+=======
+>>>>>>> a86e73a9ab16359234022fcbf0a3561dc0629900
     static const char NL = '\n';
     static const char TER = '\r';
     
