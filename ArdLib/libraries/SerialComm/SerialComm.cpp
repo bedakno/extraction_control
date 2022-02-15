@@ -12,7 +12,7 @@ SerialComm::SerialComm(){
 SerialComm::~SerialComm(){
 }
 
-bool SerialComm::process(FastPID pid){
+bool SerialComm::process(FastPID &pid){
     bool error = true;
     String cmd;
     String con;
@@ -27,10 +27,10 @@ bool SerialComm::process(FastPID pid){
     
     if(cmd == READ){
         if(con.length()==0){
-            transmit(ERR);
+            error = true;
         }
         else{
-            rdata = read(pid, con);
+            rdata = read(pid, con, data);
             transmit(String(rdata));
             error = false;
         }
@@ -50,6 +50,9 @@ bool SerialComm::process(FastPID pid){
     if(cmd == CHECK){ //Check
         transmit(CHECK);
         error = false;
+    }
+    if(error == true){
+        transmit(ERR);
     }
     return error;
 }
@@ -79,32 +82,39 @@ void SerialComm::resetInputBuffer(){
 //     return String(cmd);
 // }
 
-uint32_t SerialComm::read(FastPID pid, String cmd){
-    if(cmd==P){
+uint32_t SerialComm::read(FastPID &pid, String con, uint32_t data = 0){
+    if(con==P){
         return pid._p;
     }
-    if(cmd==I){
+    if(con==I){
         return pid._i;
     }
-    if(cmd==D){
+    if(con==D){
         return pid._d;
     }
-    if(cmd==F){
+    if(con==F){
         return pid._hz;
     }
-    if(cmd==N){
+    if(con==N){
         return IOnorm;
+    }
+    if(con == A){
+        return med_anyadc(data);
     }
     return 0;
 }
 
-void SerialComm::write(FastPID pid, String cmd, uint32_t value){
-    pid._p = pid._p*(cmd!=P)+value*(cmd==P);
-    pid._i = pid._i*(cmd!=I)+value*(cmd==I);
-    pid._d = pid._d*(cmd!=D)+value*(cmd==D);
-    pid._hz = pid._hz*(cmd!=F)+value*(cmd==F);
-    
+void SerialComm::write(FastPID &pid, String con, uint32_t value){
+    if(con==P){
+        return pid.setP(value);
+    }
+    if(con==I){
+        return pid.setI(value);
+    }
+    if(con==D){
+        return pid.setD(value);
+    }
+    if(con==F){
+        return pid.setHZ(value);
+    }
 }
-
-
-

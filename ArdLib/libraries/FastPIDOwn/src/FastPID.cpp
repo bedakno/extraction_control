@@ -15,11 +15,25 @@ void FastPID::clear() {
 bool FastPID::setCoefficients(float kp, float ki, float kd, uint32_t hz) {
     _hz=hz;
     _p = floatToParam(kp);
-    _i = floatToParam(ki / hz);
-    _d = floatToParam(kd * hz);
+    _i = floatToParam(ki/_hz);
+    _d = floatToParam(kd*_hz);
     return ! _cfg_err;
 }
 
+void FastPID::setP(uint32_t p){
+    _p = p;
+}
+
+void FastPID::setI(uint32_t i){
+    _i = i/_hz;
+}
+
+void FastPID::setD(uint32_t d){
+    _d = d*_hz;
+}
+void FastPID::setHZ(uint32_t hz){
+    _hz = hz;
+}
     
 bool FastPID::setOutputConfig(int bits, bool sign) {
     // Set output bits
@@ -124,7 +138,7 @@ int16_t FastPID::step(int16_t sp, int16_t fb) {
     }
     
     // int32 (P) + int32 (I) + int32 (D) = int34
-    int64_t out = int64_t(P) + int64_t(I) + int64_t(D);
+    int64_t out = int64_t(P) + int64_t(I/_hz) + int64_t(D*_hz);
     
     // Make the output saturate
     if (out > _outmax)

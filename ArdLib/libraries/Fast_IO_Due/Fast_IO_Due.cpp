@@ -51,14 +51,11 @@ void Fast_IO_Due::_setup_dac(){
 
 void Fast_IO_Due::initialize_adc(std::initializer_list<uint8_t> _channels = {0}){
     _setup_adc(_enable_adc_channels(_channels)); //setup and enable channels
-    //_get_adc_info(); //get some info, currently empty function
 }
 
 void Fast_IO_Due::initialize_dac(){
     _setup_dac(); //settings
-    //_get_dac_info(); //get some info, currently empty function
 }
-
 
 uint16_t Fast_IO_Due::read_adc(){
     while(!ADC_ISR_EOC7); //wait for channel to be ready
@@ -72,6 +69,14 @@ uint16_t Fast_IO_Due::read_anyadc(uint8_t _channel){
     return ADC->ADC_CDR[_adc_ch]; //get value of channel
 }
 
+uint16_t Fast_IO_Due::med_anyadc(uint8_t channel){
+    //returns the arithmetic average of any channel over 10 reads
+    uint32_t sum = 0;
+    for(uint8_t i = 0; i<10; i++){
+        sum += read_anyadc(channel);
+    }
+    return sum/10;
+}
 bool Fast_IO_Due::calc_norm(size_t nc=10){ //calculate 2047*(U_A0-UA1)/( U_A0+U_A1) from channels A0 and A1
     uint32_t _UA0=0, _UA1=0;
     for(uint8_t c=0; c<nc;c++){ //iterate over nc values
@@ -81,7 +86,7 @@ bool Fast_IO_Due::calc_norm(size_t nc=10){ //calculate 2047*(U_A0-UA1)/( U_A0+U_
         while(!ADC_ISR_EOC6);
         _UA1+=ADC->ADC_CDR[6];
     }
-    if((_UA0+_UA1)>(nc*600)){ //Sample and hold. If certain threshold is deceeded, return false, so PID-control can be stopped.
+    if((_UA0+_UA1)>(nc*600)){ //Sample and hold. If a certain threshold is deceeded, return false, so PID-control can be stopped.
         IOnorm = (2047*(_UA0-_UA1))/(_UA0+_UA1);//norm*2047 (int16_t, so no decimal places) 2047 is chosen because of 12-bit dac output range (2*2047+1=4095~4096)
         return true;
     }

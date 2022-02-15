@@ -8,10 +8,8 @@
 #ifndef Fast_IO_Due_h
 #define Fast_IO_Due_h
 
-#include "Arduino.h"
 #include <initializer_list>
-
-extern int16_t IOnorm;
+#include "Arduino.h"
 
 class Fast_IO_Due{
     
@@ -20,11 +18,12 @@ public:
     ~Fast_IO_Due();
     uint16_t read_adc(); //read 12-bit adc value
     uint16_t read_anyadc(uint8_t);
+    uint16_t med_anyadc(uint8_t);
     bool calc_norm(size_t);
     void write_dac(uint16_t); //write 12-bit value to dac
     void initialize_adc(std::initializer_list<uint8_t>);
     void initialize_dac();
-    
+
     int16_t IOnorm;
 private:
     void _setup_dac();

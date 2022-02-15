@@ -34,7 +34,10 @@ public:
     ~FastPID();
     
     bool setCoefficients(float kp, float ki, float kd, uint32_t hz);
-    void setCoefficientsRaw(uint32_t, uint32_t, uint32_t, uint32_t);
+    void setP(uint32_t p);
+    void setI(uint32_t i);
+    void setD(uint32_t d);
+    void setHZ(uint32_t hz);
     bool setOutputConfig(int bits, bool sign);
     bool setOutputRange(int16_t min, int16_t max);
     void clear();
