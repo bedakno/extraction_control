@@ -11,36 +11,40 @@
 #include <Arduino.h>
 #include "FastPID.h"
 #include "Fast_IO_Due.h"
-#include "ArdSer.h"
 
-
-class SerialComm: public interface, public FastPID, public Fast_IO_Due{
+class SerialComm:public FastPID, public Fast_IO_Due{
 public:
     SerialComm();
     ~SerialComm();
-    bool process(FastPID&);
+    bool process(FastPID&, Fast_IO_Due&);
     void resetInputBuffer();
+    void receive(void);
     
 private:
-    String READ = "R";
-    String WRITE = "W";
-    String RESET = "X";
-    String CHECK = "C";
-    String ERR = "E";
-    String A = "A";
-    String P = "P";
-    String I = "I";
-    String D = "D";
-    String F = "F";
-    String N = "N";
-    String DELIM = ":";
-    String NL = "\n";
-    String TER = "\r";
+    const static size_t BUF_SIZE = 16;
+    char arg[BUF_SIZE];
+    const char _DELIM = ':';
+    static constexpr char READ = 'R';
+    static constexpr char WRITE = 'W';
+    static constexpr char RESET = 'X';
+    static constexpr char CHECK = 'C';
+    static constexpr char ERR = 'E';
+    static constexpr char A = 'A';
+    static constexpr char P = 'P';
+    static constexpr char I = 'I';
+    static constexpr char D = 'D';
+    static constexpr char F = 'F';
+    static constexpr char N = 'N';
+    const char DELIM = ':';
+    const char NL = '\n';
+    const int _END = int(NL);
+    const char TER = '\r';
+    const char _NULL_TERM = '\0';
     
 private:
-    void write(FastPID&, String, uint32_t);
-    uint32_t read(FastPID&, String, uint32_t);
-    char* createCommand(char, char, uint32_t, size_t);
+    uint32_t fast_atoi(char*);  
+    void write(FastPID&,Fast_IO_Due&, char);
+    uint32_t read(FastPID&, Fast_IO_Due&, char);
 };
 
 #endif /* SerialComm_h */

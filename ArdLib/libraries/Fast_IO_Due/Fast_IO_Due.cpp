@@ -78,7 +78,7 @@ uint16_t Fast_IO_Due::med_anyadc(uint8_t channel){
     return sum/10;
 }
 bool Fast_IO_Due::calc_norm(size_t nc=10){ //calculate 2047*(U_A0-UA1)/( U_A0+U_A1) from channels A0 and A1
-    uint32_t _UA0=0, _UA1=0;
+    int32_t _UA0=0, _UA1=0;
     for(uint8_t c=0; c<nc;c++){ //iterate over nc values
         //get values and add them up (number of iterations will cancel out)
         while(!ADC_ISR_EOC7);

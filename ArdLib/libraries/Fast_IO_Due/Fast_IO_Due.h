@@ -24,7 +24,7 @@ public:
     void initialize_adc(std::initializer_list<uint8_t>);
     void initialize_dac();
 
-    int16_t IOnorm;
+    int32_t IOnorm;
 private:
     void _setup_dac();
     void _setup_adc(uint32_t);

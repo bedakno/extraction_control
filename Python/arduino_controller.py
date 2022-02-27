@@ -2,7 +2,7 @@ from gzip import READ
 from irrad_control.devices.arduino import arduino_serial
 import logging
 
-class Arduino_Controller(arduino_serial.ArduinoSerial):
+class ArduinoController(arduino_serial.ArduinoSerial):
     PARAM_SHIFT = 2**8
     #Delimiters
     READ_delim = 'R'
@@ -19,8 +19,13 @@ class Arduino_Controller(arduino_serial.ArduinoSerial):
     con_D = 'D' #differential
     con_HZ = 'F' #frequency
 
-    def __init__(self, port = "/dev/cu.usbmodem14301", baudrate = 115200, timeout = 1.):
+    def __init__(self, port = "/dev/cu.usbmodem14301", baudrate = 115200, timeout = 1., P = 1, I = 0, D = 0, HZ = 130000):
         super().__init__(port=port, baudrate=baudrate, timeout=timeout)
+        self.check_con()
+        self.write_data(self.con_P, P)
+        self.write_data(self.con_I, I)
+        self.write_data(self.con_D, D)
+        self.write_data(self.con_HZ, HZ)
 
     def check_con(self):
         """checks if the arduino is responding
@@ -96,6 +101,9 @@ class Arduino_Controller(arduino_serial.ArduinoSerial):
             F -> frequecy;
             valuein (float): new value
         """
+        if any(con == i for i in ['P','I','D']):
+            if (valuein > self.PARAM_SHIFT):
+                raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT))
         #transform value to FastPID format (shift bits so no decimal place)
         if con == 'P':
             value = int(valuein*self.PARAM_SHIFT)
@@ -107,7 +115,6 @@ class Arduino_Controller(arduino_serial.ArduinoSerial):
             value = valuein
         #create command string
         cmd = self.create_command(self.WRITE_delim, con, value)
-        print(cmd)
         #write data to arduino via serial
         self.write(cmd)
 

@@ -1,8 +1,10 @@
 #include <SerialComm.h>
 #include <FastPID.h>
 #include <Fast_IO_Due.h>
+
 Fast_IO_Due fastIO;
 SerialComm SCom;
+
 float Hz=160000;
 float Kp=1, Ki=2, Kd=3;
 int output_bits=11;

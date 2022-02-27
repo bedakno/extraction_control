@@ -15,25 +15,11 @@ void FastPID::clear() {
 bool FastPID::setCoefficients(float kp, float ki, float kd, uint32_t hz) {
     _hz=hz;
     _p = floatToParam(kp);
-    _i = floatToParam(ki/_hz);
-    _d = floatToParam(kd*_hz);
+    _i = floatToParam(ki);
+    _d = floatToParam(kd);
     return ! _cfg_err;
 }
 
-void FastPID::setP(uint32_t p){
-    _p = p;
-}
-
-void FastPID::setI(uint32_t i){
-    _i = i/_hz;
-}
-
-void FastPID::setD(uint32_t d){
-    _d = d*_hz;
-}
-void FastPID::setHZ(uint32_t hz){
-    _hz = hz;
-}
     
 bool FastPID::setOutputConfig(int bits, bool sign) {
     // Set output bits
@@ -90,26 +76,20 @@ uint32_t FastPID::floatToParam(float in) {
     return param;
 }
 
-float FastPID::paramToFloat(uint32_t in){
-    float out = float(in)/PARAM_MULT;
-    return out;
-}
-
 int16_t FastPID::step(int16_t sp, int16_t fb) {
-    
     // int16 + int16 = int17
-    int32_t err = int32_t(sp) - int32_t(fb);
-    int32_t P = 0, I = 0;
-    int32_t D = 0;
+    int16_t err = int16_t(sp) - int16_t(fb);
+    int64_t P = 0, I = 0;
+    int64_t D = 0;
     
     if (_p) {
         // uint16 * int16 = int32
-        P = int32_t(_p) * int32_t(err);
+        P = int32_t(_p) * int16_t(err);
     }
     
     if (_i) {
         // int17 * int16 = int33
-        _sum += int64_t(err) * int64_t(_i);
+        _sum += int32_t(err) * int32_t(_i);
         
         // Limit sum to 32-bit signed value so that it saturates, never overflows.
         if (_sum > INTEG_MAX)
@@ -122,8 +102,8 @@ int16_t FastPID::step(int16_t sp, int16_t fb) {
     }
     
     if (_d) {
-        // (int17 - int16) - (int16 - int16) = int19
-        int32_t deriv = (err - _last_err) - int32_t(sp - _last_sp);
+        // (int16 - int16) - (int16 - int16) = int19
+        int32_t deriv = int16_t(err - _last_err) - int16_t(sp - _last_sp);
         _last_sp = sp;
         _last_err = err;
         
@@ -133,7 +113,7 @@ int16_t FastPID::step(int16_t sp, int16_t fb) {
         else if (deriv < DERIV_MIN)
             deriv = DERIV_MIN;
         
-        // int16 * int16 = int32
+        // int32 * int32 = int64
         D = int32_t(_d) * int32_t(deriv);
     }
     

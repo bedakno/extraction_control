@@ -9,9 +9,9 @@
 #define DERIV_MIN    (INT16_MIN)
 
 #define PARAM_SHIFT  8
-#define PARAM_BITS   16
-#define PARAM_MAX    (((0x1ULL << PARAM_BITS)-1) >> PARAM_SHIFT) //=1111 1111
-#define PARAM_MULT   (((0x1ULL << PARAM_BITS)) >> (PARAM_BITS - PARAM_SHIFT)) //1 0000 0000
+#define PARAM_BITS   24
+#define PARAM_MAX    (((0x1ULL << PARAM_BITS)-1) >> PARAM_SHIFT)
+#define PARAM_MULT   (((0x1ULL << PARAM_BITS)) >> (PARAM_BITS - PARAM_SHIFT))
 
 /*
  A fixed point PID controller with a 32-bit internal calculation pipeline.
@@ -34,10 +34,6 @@ public:
     ~FastPID();
     
     bool setCoefficients(float kp, float ki, float kd, uint32_t hz);
-    void setP(uint32_t p);
-    void setI(uint32_t i);
-    void setD(uint32_t d);
-    void setHZ(uint32_t hz);
     bool setOutputConfig(int bits, bool sign);
     bool setOutputRange(int16_t min, int16_t max);
     void clear();
@@ -48,10 +44,10 @@ public:
         return _cfg_err;
     }
     
-    uint32_t _p;
-    uint32_t _i;
-    uint32_t _d;
-    uint32_t _hz;
+    uint64_t _p;
+    uint64_t _i;
+    uint64_t _d;
+    uint64_t _hz;
 private:
     uint32_t floatToParam(float);
     float paramToFloat(uint32_t);
