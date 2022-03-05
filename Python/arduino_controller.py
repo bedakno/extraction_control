@@ -1,8 +1,8 @@
 from gzip import READ
-from irrad_control.devices.arduino import arduino_serial
+from arduino_serial import ArduinoSerial
 import logging
 
-class ArduinoController(arduino_serial.ArduinoSerial):
+class ArduinoController(ArduinoSerial):
     PARAM_SHIFT = 2**8
     #Delimiters
     READ_delim = 'R'
@@ -10,22 +10,23 @@ class ArduinoController(arduino_serial.ArduinoSerial):
     CHECK_delim = 'C'
     RESET_delim = 'X'
     ADC_delim = 'A'
+    DAC_delim = 'D'
     ERR_delim = 'E'
     #Terminator
     TERMI = '\n'
     #Letters for constants
-    con_P = 'P' #proportional
-    con_I = 'I' #integral
-    con_D = 'D' #differential
-    con_HZ = 'F' #frequency
+    con_P = 'p' #proportional
+    con_I = 'i' #integral
+    con_D = 'd' #differential
+    con_HZ = 'f' #frequency
 
     def __init__(self, port = "/dev/cu.usbmodem14301", baudrate = 115200, timeout = 1., P = 1, I = 0, D = 0, HZ = 130000):
         super().__init__(port=port, baudrate=baudrate, timeout=timeout)
         self.check_con()
-        self.write_data(self.con_P, P)
-        self.write_data(self.con_I, I)
-        self.write_data(self.con_D, D)
-        self.write_data(self.con_HZ, HZ)
+        self.set_frequency(HZ = 130000)
+        self.set_p(value = P)
+        self.set_i(value = I)
+        self.set_d(value = D)
 
     def check_con(self):
         """checks if the arduino is responding
@@ -49,73 +50,104 @@ class ArduinoController(arduino_serial.ArduinoSerial):
         cmd = self.create_command(self.READ_delim, self.ADC_delim, adc)
         ans = self.query(cmd)
         if ans == '':
-            logging.error("no answer received")
+            raise RuntimeError("No answer received")
         return ans
     
-    def read_data(self, con):
+    def set_frequency(self, value):
+        """Sets the frequency used by PID-Controller. This does not change the actual sampling rate.
+            Actual value is estimated to be around 130kHz.
+        Args:
+            value (int): new frequency
+        """
+        if(value>0):
+            self._write_data(con = self.con_HZ, valuein = value)
+        else:
+            raise ValueError("Frequency must be greater than 0")
+        
+    def get_frequency(self):
+        """gets frequency used by PID-Controller. The value does not represent the actual sampling rate
+        """
+        self._read_data(con = self.con_HZ)
+
+    def set_p(self, value):
+        """sets P-value of PID controller
+
+        Args:
+            value (float): new value
+
+        Raises:
+            ValueError: input value must be smaller than 256 and greater or equal to 0 (Values smaller than 1/256 will be rounded to 0 or 1/256)
+        """
+        if (value > self.PARAM_SHIFT and value >=0):
+                raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
+        else:
+            self._write_data(con = self.con_P, value = value*self.PARAM_SHIFT)
+
+    def get_p(self):
+        """gets P-value of PID-controller
+        """
+        return self._read_data(con = self.con_P)/self.PARAM_SHIFT
+
+    def set_i(self, value):
+        if (value > self.PARAM_SHIFT and value >=0):
+                raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
+        else:
+            self._write_data(con = self.con_I, value = value*self.PARAM_SHIFT)
+    
+    def get_i(self):
+        """gets I-value of PID-controller
+        """
+        return self._read_data(con = self.con_I)/self.PARAM_SHIFT
+
+    def set_d(self, value):
+        if (value > self.PARAM_SHIFT and value >=0):
+                raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
+        else:
+            self._write_data(con = self.con_D, value = value*self.PARAM_SHIFT)
+
+    def get_d(self):
+        """gets D-value of PID-controller
+        """
+        return self._read_data(con = self.con_D)/self.PARAM_SHIFT
+
+    def _read_data(self, con):
         """reads data/constants from the arduino.  <con> determines which
 
         Args:
             con (char): the constant to be read.\\
-            P -> proportional;
-            I -> integral;
-            D -> differential;
-            F -> frequecy;
+            p -> proportional;
+            i -> integral;
+            d -> differential;
+            f -> frequecy;
 
         Returns:
             [float]: constant
         """
-        #create read command
         cmd = self.create_command(self.READ_delim, con)
-        #write data to arduino via serial
         ans = self.query(cmd)
         if ans == '':
-            logging.error("no answer received")
+           raise RuntimeError("No answer received")
         #get int from transmitted string
         valuestr = ''.join(x for x in ans if x.isdigit())
         if(len(valuestr)>0):
-            valuein = int(valuestr)
+            value = int(valuestr)
         else:
-            logging.error("Answer is empty")
-            return
-        #transform FastPID format to real value
-        if con == 'P':
-            value = (valuein/(self.PARAM_SHIFT))
-        elif con == 'I':
-            value = (valuein)/(self.PARAM_SHIFT)
-        elif con == 'D':
-            value = (valuein)/(self.PARAM_SHIFT)
-        else:
-            value = valuein
+            raise RuntimeError("Answer does not contain any digits")
         self.reset_buffers()
         return value
     
-    def write_data(self, con, valuein):
+    def _write_data(self, con, value):
         """writes data to arduino
-
         Args:
             con (char): constant to be set\\
-            P -> proportional;
-            I -> integral;
-            D -> differential;
-            F -> frequecy;
-            valuein (float): new value
+            p -> proportional;
+            i -> integral;
+            d -> differential;
+            f -> frequecy;
+            D -> DAC;
+            value (float): new value
         """
-        if any(con == i for i in ['P','I','D']):
-            if (valuein > self.PARAM_SHIFT):
-                raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT))
-        #transform value to FastPID format (shift bits so no decimal place)
-        if con == 'P':
-            value = int(valuein*self.PARAM_SHIFT)
-        elif con == 'I':
-            value = int(valuein*self.PARAM_SHIFT)
-        elif con == 'D':
-            value = int(valuein*self.PARAM_SHIFT)
-        else:
-            value = valuein
-        #create command string
         cmd = self.create_command(self.WRITE_delim, con, value)
-        #write data to arduino via serial
         self.write(cmd)
 
     
