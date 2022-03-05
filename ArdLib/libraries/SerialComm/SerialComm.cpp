@@ -45,9 +45,9 @@ uint32_t SerialComm::read(FastPID &pid, Fast_IO_Due &IO, char con){
         return pid._d;///pid._hz;
     case F:
         return pid._hz;
-    case N:
+    case NORM:
         return IO.IOnorm;
-    case A:
+    case _adc:
         receive();
         return med_anyadc(fast_atoi(arg));
     default:
@@ -71,6 +71,8 @@ void SerialComm::write(FastPID &pid, Fast_IO_Due &IO, char con){
     case F:
         pid._hz = value;
         break;
+    case _dac:
+        IO.write_dac(value);
     }
 }
 

@@ -3,13 +3,11 @@
 
 #include <stdint.h>
 
-#define INTEG_MAX    (INT32_MAX) 
-#define INTEG_MIN    (INT32_MIN)
 #define DERIV_MAX    (INT16_MAX)
 #define DERIV_MIN    (INT16_MIN)
 
 #define PARAM_SHIFT  8
-#define PARAM_BITS   24
+#define PARAM_BITS   16
 #define PARAM_MAX    (((0x1ULL << PARAM_BITS)-1) >> PARAM_SHIFT)
 #define PARAM_MULT   (((0x1ULL << PARAM_BITS)) >> (PARAM_BITS - PARAM_SHIFT))
 
@@ -44,10 +42,10 @@ public:
         return _cfg_err;
     }
     
-    uint64_t _p;
-    uint64_t _i;
-    uint64_t _d;
-    uint64_t _hz;
+    uint32_t _p;
+    uint32_t _i;
+    uint32_t _d;
+    int32_t _hz;
 private:
     uint32_t floatToParam(float);
     float paramToFloat(uint32_t);
@@ -57,6 +55,7 @@ private:
     
     // Configuration
     int64_t _outmax, _outmin;
+    int64_t INTEG_MAX, INTEG_MIN;
     bool _cfg_err;
     
     // State

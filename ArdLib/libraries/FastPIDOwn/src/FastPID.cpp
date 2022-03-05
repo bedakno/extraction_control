@@ -49,8 +49,10 @@ bool FastPID::setOutputRange(int16_t min, int16_t max)
         setCfgErr();
         return ! _cfg_err;
     }
-    _outmin = int64_t(min) * PARAM_MULT;
-    _outmax = int64_t(max) * PARAM_MULT;
+    _outmin = int16_t(min);
+    _outmax = int16_t(max);
+    INTEG_MAX = (int32_t(_hz) * int16_t(_outmax)*PARAM_MULT)-1;
+    INTEG_MIN = (int32_t(_hz) * int16_t(_outmin)*PARAM_MULT)+1;
     return ! _cfg_err;
 }
 
@@ -79,17 +81,17 @@ uint32_t FastPID::floatToParam(float in) {
 int16_t FastPID::step(int16_t sp, int16_t fb) {
     // int16 + int16 = int17
     int16_t err = int16_t(sp) - int16_t(fb);
-    int64_t P = 0, I = 0;
-    int64_t D = 0;
+    int32_t P = 0, I = 0;
+    int32_t D = 0;
     
     if (_p) {
         // uint16 * int16 = int32
-        P = int32_t(_p) * int16_t(err);
+        P = uint16_t(_p) * int16_t(err);
     }
     
     if (_i) {
         // int17 * int16 = int33
-        _sum += int32_t(err) * int32_t(_i);
+        _sum += uint16_t(_i) * int16_t(err);
         
         // Limit sum to 32-bit signed value so that it saturates, never overflows.
         if (_sum > INTEG_MAX)
@@ -98,7 +100,8 @@ int16_t FastPID::step(int16_t sp, int16_t fb) {
             _sum = INTEG_MIN;
         
         // int32
-        I = _sum;
+        I = int64_t(_sum)/uint32_t(_hz);
+        //Serial.println(I);
     }
     
     if (_d) {
@@ -114,25 +117,21 @@ int16_t FastPID::step(int16_t sp, int16_t fb) {
             deriv = DERIV_MIN;
         
         // int32 * int32 = int64
-        D = int32_t(_d) * int32_t(deriv);
+        D = int32_t(_d) * int32_t(deriv)*int32_t(_hz);
     }
     
     // int32 (P) + int32 (I) + int32 (D) = int34
-    int64_t out = int64_t(P) + int64_t(I/_hz) + int64_t(D*_hz);
+    int32_t out = int32_t(P) + int32_t(I) + int32_t(D);
     
-    // Make the output saturate
-    if (out > _outmax)
-        out = _outmax;
-    else if (out < _outmin)
-        out = _outmin;
     
     // Remove the integer scaling factor.
-    int16_t rval = out >> PARAM_SHIFT;
+    int16_t rval = out/PARAM_MULT;
     
-    // Fair rounding.
-    if (out & (0x1ULL << (PARAM_SHIFT - 1))) {
-        rval++;
-    }
+    // Make the output saturate
+    if (rval > _outmax)
+        rval = _outmax;
+    else if (rval < _outmin)
+        rval = _outmin;
     
     return rval;
 }
