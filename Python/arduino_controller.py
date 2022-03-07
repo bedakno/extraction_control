@@ -23,7 +23,7 @@ class ArduinoController(ArduinoSerial):
     def __init__(self, port = "/dev/cu.usbmodem14301", baudrate = 115200, timeout = 1., P = 1, I = 0, D = 0, HZ = 130000):
         super().__init__(port=port, baudrate=baudrate, timeout=timeout)
         self.check_con()
-        self.set_frequency(HZ = 130000)
+        self.set_frequency(value = 130000)
         self.set_p(value = P)
         self.set_i(value = I)
         self.set_d(value = D)
