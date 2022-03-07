@@ -38,7 +38,3 @@ class ADCDataWriter(DataWriter, ADCBoard):
                 self.write_row(**self._get_values())
         except:
             KeyboardInterrupt
-
-
-
-

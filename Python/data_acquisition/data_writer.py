@@ -253,3 +253,4 @@ class DataWriter:
                 raise KeyError("Column field is missing!")
 
             self._write_row(data_dict=row_items)
+            
