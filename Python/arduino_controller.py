@@ -67,7 +67,7 @@ class ArduinoController(ArduinoSerial):
     def get_frequency(self):
         """gets frequency used by PID-Controller. The value does not represent the actual sampling rate
         """
-        self._read_data(con = self.con_HZ)
+        return self._read_data(con = self.con_HZ)
 
     def set_p(self, value):
         """sets P-value of PID controller
