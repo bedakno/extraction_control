@@ -20,10 +20,10 @@ class ArduinoController(ArduinoSerial):
     con_D = 'd' #differential
     con_HZ = 'f' #frequency
 
-    def __init__(self, port = "/dev/cu.usbmodem14301", baudrate = 115200, timeout = 1., P = 1, I = 0, D = 0, HZ = 130000):
+    def __init__(self, port = "/dev/cu.usbmodem14301", baudrate=115200, timeout=1., P=1, I=0, D=0, HZ=130000):
         super().__init__(port=port, baudrate=baudrate, timeout=timeout)
         self.check_con()
-        self.set_frequency(value = 130000)
+        self.set_frequency(value = HZ)
         self.set_p(value = P)
         self.set_i(value = I)
         self.set_d(value = D)
@@ -32,7 +32,8 @@ class ArduinoController(ArduinoSerial):
         """checks if the arduino is responding
 
         Raises:
-            RuntimeError: One of two things happend: either the arduino is stuck in code and is not responding or the serial connection was not successful
+            RuntimeError: One of two things happend: either the arduino is stuck in code and is not responding\\
+                or the serial connection was not successful
         """
         cmd = self.create_command(self.CHECK_delim)
         ans = self.query(cmd)
@@ -59,7 +60,7 @@ class ArduinoController(ArduinoSerial):
         Args:
             value (int): new frequency
         """
-        if(value>0):
+        if(value > 0):
             self._write_data(con = self.con_HZ, value = value)
         else:
             raise ValueError("Frequency must be greater than 0")
@@ -69,41 +70,45 @@ class ArduinoController(ArduinoSerial):
         """
         return self._read_data(con = self.con_HZ)
 
-    def set_p(self, value):
+    def set_p(self, input):
         """sets P-value of PID controller
 
         Args:
             value (float): new value
 
         Raises:
-            ValueError: input value must be smaller than 256 and greater or equal to 0 (Values smaller than 1/256 will be rounded to 0 or 1/256)
+            ValueError: input value must be smaller than 256 and greater or equal to 0\\
+                (Values smaller than 1/256 will be rounded to 0 or 1/256)
         """
-        if (value > self.PARAM_SHIFT and value >=0):
+        if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            self._write_data(con = self.con_P, value = value*self.PARAM_SHIFT)
+            output = input * self.PARAM_SHIFT
+            self._write_data(con = self.con_P, value = output)
 
     def get_p(self):
         """gets P-value of PID-controller
         """
         return self._read_data(con = self.con_P)/self.PARAM_SHIFT
 
-    def set_i(self, value):
-        if (value > self.PARAM_SHIFT and value >=0):
+    def set_i(self, input):
+        if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            self._write_data(con = self.con_I, value = value*self.PARAM_SHIFT)
+            output = input * self.PARAM_SHIFT
+            self._write_data(con = self.con_I, value = output)
     
     def get_i(self):
         """gets I-value of PID-controller
         """
         return self._read_data(con = self.con_I)/self.PARAM_SHIFT
 
-    def set_d(self, value):
-        if (value > self.PARAM_SHIFT and value >=0):
+    def set_d(self, input):
+        if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            self._write_data(con = self.con_D, value = value*self.PARAM_SHIFT)
+            output = input * self.PARAM_SHIFT
+            self._write_data(con = self.con_D, value = output)
 
     def get_d(self):
         """gets D-value of PID-controller
@@ -148,6 +153,7 @@ class ArduinoController(ArduinoSerial):
             value (float): new value
         """
         cmd = self.create_command(self.WRITE_delim, con, value)
+        print(cmd)
         self.write(cmd)
 
     
