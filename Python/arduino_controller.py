@@ -79,10 +79,14 @@ class ArduinoController(ArduinoSerial):
         else:
             raise ValueError("Frequency must be greater than 0")
     def get_values(self, adc0, adc1):
-        while True:
-            print(self.read_adc(adc = adc0))
-            print(self.read_adc(adc = adc1))
-            print(self.get_norm)
+        try:
+            while True:
+               print(self.read_adc(adc = adc0))
+               print(self.read_adc(adc = adc1))
+               print(self.get_norm)
+        except KeyboardInterrupt:
+            pass
+        
 
     def get_frequency(self):
         """gets frequency used by PID-Controller. The value does not represent the actual sampling rate
