@@ -130,6 +130,7 @@ class ArduinoController(ArduinoSerial):
         """
         cmd = self.create_command(self.READ_delim, con)
         ans = self.query(cmd)
+        print(ans)
         if ans == '':
            raise RuntimeError("No answer received")
         #get int from transmitted string
