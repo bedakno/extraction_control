@@ -11,6 +11,7 @@ class ArduinoController(ArduinoSerial):
     RESET_delim = 'X'
     ADC_delim = 'A'
     DAC_delim = 'D'
+    NORM_delim = 'N'
     ERR_delim = 'E'
     #Terminator
     TERMI = '\n'
@@ -54,6 +55,19 @@ class ArduinoController(ArduinoSerial):
             raise RuntimeError("No answer received")
         return ans
     
+    def get_norm(self):
+        """gets the calculated norm from an arduino
+
+        Returns:
+            norm: as arduino can only answer unsigned ints, a negative norm results in the first bit of 32 bit return to be flipped\\
+                resulting in huge numbers. 2**32 is subtracted when norm is too great to solve this issue
+        """
+        norm = self.read_data(con = self.NORM_delim)
+        if norm > 5000:
+            norm-=2**32
+        return norm
+
+
     def set_frequency(self, value):
         """Sets the frequency used by PID-Controller. This does not change the actual sampling rate.
             Actual value is estimated to be around 130kHz.
@@ -64,7 +78,12 @@ class ArduinoController(ArduinoSerial):
             self._write_data(con = self.con_HZ, value = int(value))
         else:
             raise ValueError("Frequency must be greater than 0")
-        
+    def get_values(self, adc0, adc1):
+        while True:
+            print(self.read_adc(adc = adc0))
+            print(self.read_adc(adc = adc1))
+            print(self.get_norm)
+
     def get_frequency(self):
         """gets frequency used by PID-Controller. The value does not represent the actual sampling rate
         """
