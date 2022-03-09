@@ -61,7 +61,7 @@ class ArduinoController(ArduinoSerial):
             value (int): new frequency
         """
         if(value > 0):
-            self._write_data(con = self.con_HZ, value = value)
+            self._write_data(con = self.con_HZ, value = int(value))
         else:
             raise ValueError("Frequency must be greater than 0")
         
@@ -83,7 +83,7 @@ class ArduinoController(ArduinoSerial):
         if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            output = input * self.PARAM_SHIFT
+            output = int(input * self.PARAM_SHIFT)
             self._write_data(con = self.con_P, value = output)
 
     def get_p(self):
@@ -95,7 +95,7 @@ class ArduinoController(ArduinoSerial):
         if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            output = input * self.PARAM_SHIFT
+            output = int(input * self.PARAM_SHIFT)
             self._write_data(con = self.con_I, value = output)
     
     def get_i(self):
@@ -107,7 +107,7 @@ class ArduinoController(ArduinoSerial):
         if (input > self.PARAM_SHIFT or input < 0):
                 raise ValueError("PID-constants must be smaller than "+ str(self.PARAM_SHIFT) + " and greater or equal to 0")
         else:
-            output = input * self.PARAM_SHIFT
+            output = int(input * self.PARAM_SHIFT)
             self._write_data(con = self.con_D, value = output)
 
     def get_d(self):
