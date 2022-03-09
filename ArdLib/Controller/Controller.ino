@@ -7,7 +7,7 @@ Fast_IO_Due fastIO;
 SerialComm SCom;
 
 float Hz=130000;
-float Kp=0, Ki=1, Kd=0;
+float Kp=0, Ki=0, Kd=0;
 int output_bits=11;
 bool output_signed=true;
 FastPID myPID(Kp, Ki, Kd, Hz, output_bits, output_signed);
@@ -24,7 +24,7 @@ void checkPID(){
 void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
-  fastIO.initialize_adc({0,1});
+  fastIO.initialize_adc({0,1,2,3,4,5});
   fastIO.initialize_dac();
   checkPID();
   myPID.setOutputRange(-2047,2047);

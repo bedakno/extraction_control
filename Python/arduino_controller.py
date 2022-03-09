@@ -1,6 +1,7 @@
 from gzip import READ
 from arduino_serial import ArduinoSerial
 import logging
+from time import sleep
 
 class ArduinoController(ArduinoSerial):
     PARAM_SHIFT = 2**8
@@ -83,7 +84,9 @@ class ArduinoController(ArduinoSerial):
             while True:
                print(self.read_adc(adc = adc0))
                print(self.read_adc(adc = adc1))
-               print(self.get_norm)
+               print(self.get_norm())
+               print("")
+               sleep(0.5)
         except KeyboardInterrupt:
             pass
         

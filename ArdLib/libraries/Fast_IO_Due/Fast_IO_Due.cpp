@@ -81,8 +81,8 @@ bool Fast_IO_Due::calc_norm(size_t nc=10){ //calculate 2047*(U_A0-UA1)/( U_A0+U_
     int32_t _UA0=0, _UA1=0;
     for(uint8_t c=0; c<nc;c++){ //iterate over nc values
         //get values and add them up (number of iterations will cancel out)
-        while(!ADC_ISR_EOC7);
-        _UA0+=ADC->ADC_CDR[7];
+        while(!ADC_ISR_EOC2);
+        _UA0+=ADC->ADC_CDR[2];
         while(!ADC_ISR_EOC6);
         _UA1+=ADC->ADC_CDR[6];
     }

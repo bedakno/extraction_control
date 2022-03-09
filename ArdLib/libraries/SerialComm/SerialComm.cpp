@@ -40,9 +40,9 @@ uint32_t SerialComm::read(FastPID &pid, Fast_IO_Due &IO, char con){
     case P:
         return pid._p;
     case I:
-        return pid._i;//*pid._hz;
+        return pid._i;
     case D:
-        return pid._d;///pid._hz;
+        return pid._d;
     case F:
         return pid._hz;
     case NORM:
@@ -63,10 +63,10 @@ void SerialComm::write(FastPID &pid, Fast_IO_Due &IO, char con){
         pid._p = value;
         break;
     case I:
-        pid._i = value;///pid._hz;
+        pid._i = value;
         break;
     case D:
-        pid._d = value;//*pid._hz;
+        pid._d = value;
         break;
     case F:
         pid._hz = value;
