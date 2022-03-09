@@ -24,9 +24,9 @@ class ArduinoController(ArduinoSerial):
         super().__init__(port=port, baudrate=baudrate, timeout=timeout)
         self.check_con()
         self.set_frequency(value = HZ)
-        self.set_p(value = P)
-        self.set_i(value = I)
-        self.set_d(value = D)
+        self.set_p(input = P)
+        self.set_i(input = I)
+        self.set_d(input = D)
 
     def check_con(self):
         """checks if the arduino is responding
