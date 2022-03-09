@@ -63,7 +63,7 @@ class ArduinoController(ArduinoSerial):
             norm: as arduino can only answer unsigned ints, a negative norm results in the first bit of 32 bit return to be flipped\\
                 resulting in huge numbers. 2**32 is subtracted when norm is too great to solve this issue
         """
-        norm = self.read_data(con = self.NORM_delim)
+        norm = self._read_data(con = self.NORM_delim)
         if norm > 5000:
             norm-=2**32
         return norm
